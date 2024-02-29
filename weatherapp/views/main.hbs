@@ -10,25 +10,25 @@
     <title>Document</title>
 </head>
 <body>
+<script>
+    // if user don't allowed geolocation, just ignore
+
+    // after used allowed, we should check, is actual page contains
+</script>
+
 <div>
-    <table class="table">
-        <thead>
-        ...
-        </thead>
-        <tbody>
-        <tr class="table-active">
-            ...
-        </tr>
-        <tr>
-            ...
-        </tr>
-        <tr>
-            <th scope="row">3</th>
-            <td colspan="2" class="table-active">Larry the Bird</td>
-            <td>@twitter</td>
-        </tr>
-        </tbody>
-    </table>
+    {{>header}}
+
+    <div class="container">
+
+            {{#if weather}}
+                {{>weatherinfo}}
+            {{else}}
+                Please allow geolocation to display weather in your city.
+            {{/if}}
+    </div>
+
+    {{>footer}}
 </div>
 </body>
 </html>
