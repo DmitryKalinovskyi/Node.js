@@ -2,11 +2,13 @@ const express = require('express')
 const hbs = require('hbs');
 const fs = require('fs');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 let app = express();
 
 const IS_DEBUG = true;
 
 app.use(express.json());
+app.use(cookieParser());
 
 // configure hbs
 hbs.registerPartials(__dirname + "/views/partials");
@@ -44,15 +46,17 @@ app.get('/login', (req, res) => {
 
 app.get('/weather', async (req, res) => {
 
-    if(req.body?.latitude  &&  req.body?.longitude){
+    console.log(req.cookies);
+
+    if(req.cookies?.lat  &&  req.cookies?.lon){
         // find city by geolocation
 
-        const city = await getCityByGeolocation(req.body.latitude, req.body.longitude);
+        const city = await getCityByGeolocation(req.cookies.lat, req.cookies.lon);
         console.log(city);
 
         const weather = await getWeatherFromCity(city);
 
-        res.render('main.hbs', {weather})
+        res.render('main.hbs', {weather, city})
     }
     else{
         res.render('main.hbs');
@@ -66,24 +70,24 @@ async function getWeatherFromCity(city){
 }
 
 async function getCityByGeolocation(lat, lon){
-    const response = `http://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${config_secret.api}`;
+    const response = await fetch(`http://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${config_secret.api}`);
 
-    return await response.json();
+    return (await response.json())[0].name;
 }
 
 app.get('/weather/:city', async (req, res) => {
-    const active = req.params.city;
+    const city = req.params.city;
     const cities = config.cities;
 
-     if(cities.includes(active) === false){
+     if(cities.includes(city) === false){
          res.sendStatus(404);
          return;
      }
      try{
-        const weather = await getWeatherFromCity(active);
+        const weather = await getWeatherFromCity(city);
         console.log(weather);
 
-        res.render('weather.hbs', {weather, cities, active});
+        res.render('weather.hbs', {weather, cities, city});
      }catch (e){
          if(IS_DEBUG){
              res.send(e.message)
