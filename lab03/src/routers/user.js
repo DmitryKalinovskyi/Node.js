@@ -34,6 +34,46 @@ router.get('/users/:id', async (req, res) => {
     }
 });
 
+router.get('/users/email/:email', async (req, res) => {
+
+    try {
+        const email = req.params.email;
+        const user = await UserModel.findOne({email});
+
+        if (user == null) {
+            res.sendStatus(404);
+        } else {
+            res.status(200).send(user);
+        }
+    }
+    catch(err){
+        res.sendStatus(500);
+    }
+});
+
+router.get('/users/emailstart/:email', async (req, res) => {
+
+    try {
+        let email = req.params.email;
+       // console.log(email);
+        if(email[0] === ':')
+            email = "";
+
+        const escapedEmail = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        //console.log(escapedEmail);
+
+        const regex = new RegExp(`^${escapedEmail}`, 'i');
+       // console.log(regex);
+
+        const users = await UserModel.find({email: regex }).limit(10);
+
+        res.status(200).send(users);
+    }
+    catch(err){
+        res.sendStatus(500);
+    }
+});
+
 router.post("/users", async (req, res) => {
     try {
         const user = new UserModel({
