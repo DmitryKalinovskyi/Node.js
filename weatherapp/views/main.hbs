@@ -5,72 +5,15 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="/js/bootstrap.bundle.js" defer></script>
+    <link rel="stylesheet" href="../public/style.css">
 
     <title>Document</title>
 </head>
 <body>
-<script>
-    function cookiesAsObject(){
-        let tokens = document.cookie.split(';');
-
-        const cook = {};
-        for(let token of tokens){
-            let [key, value] = token.split('=');
-
-            key = key.trim();
-            cook[key] = value;
-        }
-
-        return cook;
-    }
-
-    function sendGeolocationIfRequired() {
-        return navigator.geolocation.getCurrentPosition(function(result) {
-            // check whether cookie information is the same
-            console.log(window.location)
-
-            // localStorage.clear();
-            // document.cookie = "";
-
-            // const latitude1 = +(localStorage.getItem("latitude"));
-            // const longitude1 = +(localStorage.getItem("longitude"));
-
-            let cookies = cookiesAsObject();
-console.log(cookies);
-            const lat = result.coords.latitude
-            const lon = result.coords.longitude
-
-            let updated = false;
-            if(+(cookies.lat) !== lat) {
-
-                document.cookie = `lat=${lat};`;
-                updated = true;
-            }
-
-            if(+(cookies.lon) !== lon){
-                document.cookie = `lon=${lon};`;
-                updated = true;
-            }
-
-            if(updated)
-                window.location.replace(window.location.href);
-        });
-    }
-
-    // if user don't allowed geolocation, just ignore
-    function applyGeolocation() {
-        if (navigator.geolocation) {
-            console.log("Geolocation is supported by this browser :)");
-            sendGeolocationIfRequired();
-        } else {
-            console.log("Geolocation is NOT supported by this browser :(");
-        }
-    }
-
-    applyGeolocation()
-    // after used allowed, we should check, is actual page contains
-</script>
+<script src="../public/geoCookie.js"></script>
 
 <div>
     {{>header}}

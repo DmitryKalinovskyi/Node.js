@@ -1,0 +1,16 @@
+body{
+    background: rgb(86,153,224);
+    background: linear-gradient(0deg, rgba(86,153,224,1) 0%, rgba(130,175,212,1) 100%);
+}
+
+.text-turtiquose{
+    color: #5594cd;
+}
+
+.bg-body-turtiquose{
+    background-color: #5594cd;
+}
+
+.text-light-turtiquose{
+    color: #d2ddec;
+}

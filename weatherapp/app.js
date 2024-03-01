@@ -21,10 +21,27 @@ hbs.registerHelper('celsia', function(arg1) {
     return Math.round(arg1-272.15) + " C°";
 });
 
+hbs.registerHelper('time', function(timeFromUtc, timezone) {
+    const date = new Date(0);
+    date.setUTCSeconds(timeFromUtc + timezone);
+
+    return date.toLocaleTimeString();
+});
+
+hbs.registerHelper('distance', function(arg1) {
+    const km = (+arg1) / 1000;
+
+    if(km > 1)
+        return km + " km";
+
+    return arg1 + " meters";
+});
+
 
 // bootstrap
 app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')))
 app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')))
+app.use('/public', express.static(path.join(__dirname, 'public')));
 // app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery/dist')))
 
 function loadAsObjectFrom(path){
@@ -46,8 +63,7 @@ app.get('/login', (req, res) => {
 
 app.get('/weather', async (req, res) => {
 
-    console.log(req.cookies);
-
+    const cities = getCities();
     if(req.cookies?.lat  &&  req.cookies?.lon){
         // find city by geolocation
 
@@ -55,12 +71,11 @@ app.get('/weather', async (req, res) => {
         console.log(city);
 
         const weather = await getWeatherFromCity(city);
-
-        res.render('main.hbs', {weather, city})
+        console.log(weather);
+        res.render('main.hbs', {weather, city, location: city, cities})
     }
     else{
-        res.render('main.hbs');
-
+        res.render('main.hbs', cities);
     }
 });
 
@@ -75,10 +90,14 @@ async function getCityByGeolocation(lat, lon){
     return (await response.json())[0].name;
 }
 
+function getCities(){
+    return config.cities;
+}
+
+
 app.get('/weather/:city', async (req, res) => {
     const city = req.params.city;
-    const cities = config.cities;
-
+    const cities = getCities();
      if(cities.includes(city) === false){
          res.sendStatus(404);
          return;
