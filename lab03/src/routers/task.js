@@ -2,12 +2,14 @@ const express = require("express");
 const TaskModel = require("../../models/task");
 const {getObjectId} = require("../utils");
 const ValidationError = require("mongoose").Error.ValidationError;
+const auth = require("../middleware/auth");
+const hasRole = require("../middleware/hasRole");
 
 const router = new express.Router();
 
-router.get("/tasks", async (req, res) => {
+router.get("/tasks", auth, async (req, res) => {
     try{
-        const tasks = await TaskModel.find({});
+        const tasks = await TaskModel.find({owner: req.user._id});
         res.status(200).send(tasks);
     }
     catch(err){
@@ -15,31 +17,32 @@ router.get("/tasks", async (req, res) => {
     }
 });
 
-router.get('/tasks/:id', async (req, res) => {
-
+router.get('/tasks/:id', auth, async (req, res) => {
     try {
 
         let _id = getObjectId(req.params.id);
 
-        const task = await TaskModel.findOne({_id});
+        const task = await TaskModel.findOne({_id, owner: req.user._id});
 
-        if (task == null) {
+        if(!task){
             res.sendStatus(404);
-        } else {
-            res.status(200).send(task);
+            return;
         }
+
+        res.status(200).send(task);
     }
     catch(err){
         res.sendStatus(500);
     }
 });
 
-router.post("/tasks", async (req, res) => {
+router.post("/tasks", auth, async (req, res) => {
     try {
         const task = new TaskModel({
             title: req.body.title,
             description: req.body.description,
-            completed: req.body.completed
+            completed: req.body.completed,
+            owner: req.user.id
         });
 
         await task.save();
@@ -58,13 +61,13 @@ router.post("/tasks", async (req, res) => {
     }
 });
 
-router.patch("/tasks/:id", async (req, res) => {
+router.patch("/tasks/:id", auth, async (req, res) => {
     try{
         const _id = getObjectId(req.params.id);
 
         const patchQuery = {$set:req.body};
 
-        await TaskModel.updateMany({_id}, patchQuery);
+        await TaskModel.updateMany({_id, owner: req.user._id}, patchQuery);
 
         res.sendStatus(200);
     }
@@ -75,10 +78,10 @@ router.patch("/tasks/:id", async (req, res) => {
     }
 });
 
-router.delete("/tasks/:id", async (req, res) => {
+router.delete("/tasks/:id", auth, async (req, res) => {
     try{
         let _id = getObjectId(req.params.id);
-        const task = await TaskModel.findOne({_id});
+        const task = await TaskModel.findOne({_id, owner: req.user._id});
 
         if(task == null){
             res.sendStatus(404);
@@ -95,9 +98,9 @@ router.delete("/tasks/:id", async (req, res) => {
     }
 });
 
-router.delete("/tasks", async (req, res) => {
+router.delete("/tasks", auth, async (req, res) => {
     try{
-        await TaskModel.deleteMany({});
+        await TaskModel.deleteMany({owner: req.user._id});
 
         res.sendStatus(200);
     }

@@ -18,6 +18,9 @@ router.get("/users", auth, async (req, res) => {
 });
 
 router.get("/users/me", auth, async (req, res) => {
+    await req.user.populate('tasks');
+
+
     res.status(200).send(req.user);
 })
 
@@ -53,11 +56,14 @@ router.get('/users/:id', auth, async (req, res) => {
 
         const user = await UserModel.findOne({_id});
 
-        if (user == null) {
+        await user.populate('tasks');
+
+        if(!user){
             res.sendStatus(404);
-        } else {
-            res.status(200).send(user);
+            return;
         }
+
+        res.status(200).send(user);
     }
     catch(err){
         res.sendStatus(500);

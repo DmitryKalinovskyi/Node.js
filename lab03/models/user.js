@@ -39,8 +39,31 @@ let userSchema = new mongoose.Schema( {
                 type: String,
                 required: true
             }
-    }]
-});
+    }],
+}, {toJSON: {virtuals: true}, toObject: {virtuals: true}});
+
+// Add virtual field to the userModel
+userSchema.virtual('tasks', {
+    ref: "Task",
+    localField: "_id",
+    foreignField: 'owner'
+})
+
+// Remove access to the private fields
+userSchema.methods.toJSON = function (){
+    const user = this;
+
+
+    const userObject = user.toObject();
+    delete userObject.password;
+    delete userObject.tokens;
+    //delete userObject.id;
+
+ //   console.log(userObject);
+
+    return userObject;
+}
+
 
 // Add handler before saving the model
 userSchema.pre('save', async function(next){
