@@ -75,7 +75,7 @@ app.get('/weather', async (req, res) => {
         res.render('main.hbs', {weather, city, location: city, cities})
     }
     else{
-        res.render('main.hbs', cities);
+        res.render('main.hbs', {cities});
     }
 });
 

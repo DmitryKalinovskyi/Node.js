@@ -10,7 +10,7 @@
     <script src="/js/bootstrap.bundle.js" defer></script>
     <link rel="stylesheet" href="../public/style.css">
 
-    <title>Document</title>
+    <title>Weather in your city</title>
 </head>
 <body>
 <script src="../public/geoCookie.js"></script>
@@ -24,7 +24,9 @@
             {{#if weather}}
                 {{>weatherinfo}}
             {{else}}
-                Please allow geolocation to display weather in your city.
+                <div class="text-white " style="height: calc(100vh - 210px)">
+                    Please allow geolocation to display weather in your city.
+                </div>
             {{/if}}
     </div>
     </div>

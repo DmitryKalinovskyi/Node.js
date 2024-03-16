@@ -1,3 +1,6 @@
+# private information
+config-secret.json
+
 # Logs
 logs
 *.log
