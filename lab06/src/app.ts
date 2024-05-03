@@ -1,4 +1,4 @@
-import express, {Request, Response, Express} from 'express'
+import express, {Request, Response} from 'express'
 import dotenv from 'dotenv'
 import http from "http"
 
@@ -20,7 +20,8 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const port = process.env.Port || 3000;
-app.use("/", express.static(path.join(__dirname, 'public')));
+console.log(__dirname);
+app.use("/", express.static(path.join(__dirname + "\\..", 'public')));
 app.get('/', (req: Request, res: Response) => {
    res.send("Typescript + node.js + web-sockets (socket.io)");
 });

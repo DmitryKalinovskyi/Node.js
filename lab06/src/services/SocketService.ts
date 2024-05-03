@@ -12,7 +12,7 @@ export class SocketService implements ISocketService{
     private _roomsService: RoomsService;
     private socket: any;
     private io: any;
-    constructor(io, socket: any, clientService:ClientService, roomsService: RoomsService) {
+    constructor(io: any, socket: any, clientService:ClientService, roomsService: RoomsService) {
         this._clientService = clientService;
         this._roomsService = roomsService;
 
@@ -41,12 +41,12 @@ export class SocketService implements ISocketService{
         const room = this._roomsService.getRoom(roomName);
 
         // emit user
-        this.socket.emit("joined");
+        this.socket.emit("joined", {room, clients: this._clientService.getClientsInTheRoom(roomName)});
         const event = new JoinEvent(client);
         room.addEvent(event);
 
         // emit all users in the room
-        this.socket.to(roomName).emit("server-event", event);
+        this.io.to(roomName).emit("server-event", event);
     }
 
     message(messageContent: string) {
@@ -62,9 +62,8 @@ export class SocketService implements ISocketService{
         const event = new MessageEvent(client, messageContent);
 
         this.socket.emit("message-received");
-
-        room.addEvent(MessageEvent);
-        this.socket.broadcast.to(client.room).emit('message', event);
+        room.addEvent(event);
+        this.io.to(client.room).emit('server-event', event);
     }
 
     disconnect(){

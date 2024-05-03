@@ -15,4 +15,6 @@ export class JoinEvent implements ISocketEvent{
      public constructor(client: ClientModel) {
           this.client = client;
      }
+
+     eventType: string = "JoinEvent";
 }

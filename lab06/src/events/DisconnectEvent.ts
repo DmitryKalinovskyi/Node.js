@@ -12,4 +12,6 @@ export class DisconnectEvent implements ISocketEvent{
     public constructor(client:ClientModel) {
         this.client = client;
     }
+
+    eventType: string = "DisconnectEvent";
 }

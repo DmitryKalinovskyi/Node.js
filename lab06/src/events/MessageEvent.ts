@@ -9,4 +9,6 @@ export class MessageEvent implements  ISocketEvent{
         this.sender = sender;
         this.message = message;
     }
+
+    eventType: string = "MessageEvent";
 }
