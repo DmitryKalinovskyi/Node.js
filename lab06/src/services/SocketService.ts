@@ -69,7 +69,7 @@ export class SocketService implements ISocketService{
         this._clientService.deleteClient(this.socket.id);
 
         const room = this._roomsService.getRoomData(client.room);
-        const message = {content: `${client.name} disconnected.`, type: 'server'};
+        const message = {content: `${client.name} disconnected.`, type: 'server', name: client.name};
         room.addMessage(message);
         this.socket.to(client.room).emit("user-disconnected", message);
     }

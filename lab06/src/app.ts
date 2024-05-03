@@ -38,6 +38,24 @@ io.on('connection', socket => {
     socket.on('disconnect', () => socketService.disconnect());
 })
 
+// Creating
+let foo:any = {};
+foo.x = 3;
+foo.y='123';
+
+let jsonString = JSON.stringify(foo);
+console.log(jsonString);
+
+
+// Reading
+interface Bar{
+    x:number;
+    y?:string;
+}
+
+let baz:Bar = JSON.parse(jsonString);
+console.log(baz);
+
 server.listen(port, () => {
     console.log("Server started!");
 })
