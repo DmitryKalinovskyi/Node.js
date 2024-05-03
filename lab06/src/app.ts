@@ -10,6 +10,7 @@ import * as path from "node:path";
 import {SocketService} from "./services/SocketService";
 import {ISocketService} from "./services/ISocketService";
 import {RoomsService} from "./services/RoomsService";
+import {RoomController} from "./controllers/RoomController";
 
 dotenv.config();
 
@@ -24,37 +25,22 @@ app.get('/', (req: Request, res: Response) => {
    res.send("Typescript + node.js + web-sockets (socket.io)");
 });
 
-const roomService = new RoomsService();
+const roomsService = new RoomsService();
 const clientService = new ClientService();
+
+const roomController = new RoomController(clientService, roomsService);
+app.get('/roomData', (req: Request, res: Response) => roomController.getRoom(req, res));
 
 // hande sockets request
 io.on('connection', socket => {
-    const socketService: ISocketService = new SocketService(io, socket, clientService, roomService);
+    const socketService: ISocketService = new SocketService(io, socket, clientService, roomsService);
 
     socket.on('join', (name, room) => socketService.join(name, room))
 
     socket.on('message', (message) => socketService.message(message));
 
     socket.on('disconnect', () => socketService.disconnect());
-})
-
-// Creating
-let foo:any = {};
-foo.x = 3;
-foo.y='123';
-
-let jsonString = JSON.stringify(foo);
-console.log(jsonString);
-
-
-// Reading
-interface Bar{
-    x:number;
-    y?:string;
-}
-
-let baz:Bar = JSON.parse(jsonString);
-console.log(baz);
+});
 
 server.listen(port, () => {
     console.log("Server started!");

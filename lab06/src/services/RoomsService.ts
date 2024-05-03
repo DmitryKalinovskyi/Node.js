@@ -9,7 +9,7 @@ export class RoomsService{
         this.rooms = {};
     }
 
-    getRoomData(name: string): Room{
+    getRoom(name: string): Room{
         if(name in this.rooms){
             return this.rooms[name];
         }

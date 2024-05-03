@@ -3,6 +3,9 @@ import {RoomsService} from "./RoomsService";
 import {ClientModel} from "../models/ClientModel";
 import {Socket} from "socket.io";
 import {ISocketService} from "./ISocketService";
+import {JoinEvent} from "../events/JoinEvent";
+import {DisconnectEvent} from "../events/DisconnectEvent";
+import {MessageEvent} from "../events/MessageEvent";
 
 export class SocketService implements ISocketService{
     private _clientService: ClientService;
@@ -25,21 +28,25 @@ export class SocketService implements ISocketService{
 
     join(name: string, roomName: string){
         const id = this.socket.id;
-        this._clientService.registerClient(id, new ClientModel(id, name, roomName))
+
+        if(this._clientService.isRegistered(id))
+            return;
+
+        let client =  new ClientModel(id, name, roomName);
+        this._clientService.registerClient(id, client)
 
         // after user is registered, we need to add to the room
         this.socket.join(roomName);
 
-        const clients = this._clientService.getClientsInTheRoom(roomName);
-        const room = this._roomsService.getRoomData(roomName);
-        // emit user
-        this.socket.emit("joined", {clients, room});
+        const room = this._roomsService.getRoom(roomName);
 
-        const message = {content: `${name} joined to the server`, type:'server'};
-        room.addMessage(message);
+        // emit user
+        this.socket.emit("joined");
+        const event = new JoinEvent(client);
+        room.addEvent(event);
 
         // emit all users in the room
-        this.socket.to(roomName).emit("user-joined", name);
+        this.socket.to(roomName).emit("server-event", event);
     }
 
     message(messageContent: string) {
@@ -50,13 +57,14 @@ export class SocketService implements ISocketService{
 
         const client = this._clientService.getClient(this.socket.id);
 
-        // console.log(`${client.name} send message: ${message}`);
-        // socket.broadcast.to(userRoom).emit("message", `User send message: ${message}!`);
-        const room = this._roomsService.getRoomData(client.room);
-        const message = {sender: client.name, content: messageContent, type: 'client'}
-        this.socket.emit("message-received", message);
-        room.addMessage(message);
-        this.socket.broadcast.to(client.room).emit('message', message);
+        const room = this._roomsService.getRoom(client.room);
+
+        const event = new MessageEvent(client, messageContent);
+
+        this.socket.emit("message-received");
+
+        room.addEvent(MessageEvent);
+        this.socket.broadcast.to(client.room).emit('message', event);
     }
 
     disconnect(){
@@ -68,9 +76,10 @@ export class SocketService implements ISocketService{
         const client = this._clientService.getClient(this.socket.id);
         this._clientService.deleteClient(this.socket.id);
 
-        const room = this._roomsService.getRoomData(client.room);
-        const message = {content: `${client.name} disconnected.`, type: 'server', name: client.name};
-        room.addMessage(message);
-        this.socket.to(client.room).emit("user-disconnected", message);
+        const room = this._roomsService.getRoom(client.room);
+
+        const event = new DisconnectEvent(client);
+        room.addEvent(event)
+        this.socket.to(client.room).emit("server-event", event);
     }
 }
