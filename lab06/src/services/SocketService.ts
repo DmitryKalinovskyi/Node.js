@@ -6,6 +6,8 @@ import {ISocketService} from "./ISocketService";
 import {JoinEvent} from "../events/JoinEvent";
 import {DisconnectEvent} from "../events/DisconnectEvent";
 import {MessageEvent} from "../events/MessageEvent";
+import {PrivateMessageEvent} from "../events/PrivateMessageEvent";
+import {ISocketEvent} from "../events/ISocketEvent";
 
 export class SocketService implements ISocketService{
     private _clientService: ClientService;
@@ -18,12 +20,59 @@ export class SocketService implements ISocketService{
 
         this.io = io;
         this.socket = socket;
-
-        this.initialize();
     }
 
-    private initialize(){
+    private emitToRoom(room: string, eventName: string, event: ISocketEvent, filter){
+        if(filter == undefined)
+            this.io.to(room).emit(eventName, event);
+        else{
+            for(let client in this._clientService.getClientsInTheRoom(room)){
+                if(filter(client)){
+                    this.io.to()
+                }
+            }
+        }
+    }
 
+    onType(){
+        if(this._clientService.isRegistered(this.socket.id) === false) {
+            this.socket.emit("server-message", "you are not joined.");
+            return;
+        }
+
+        const client = this._clientService.getClient(this.socket.id);
+
+        this.socket.broadcast.to(client.room).emit("on-type", client);
+    }
+
+    privateMessage(message: string, receiverId: string): void {
+        if(this._clientService.isRegistered(this.socket.id) === false){
+            this.socket.emit("server-message", "you are not joined.");
+            return;
+        }
+
+        if(this._clientService.isRegistered(receiverId) === false){
+            this.socket.emit("server-message", "receiver are not joined.");
+            return;
+        }
+
+        if(receiverId === this.socket.id){
+            this.socket.emit("server-message", "you can't send to yourself.");
+            return;
+        }
+
+        const client = this._clientService.getClient(this.socket.id);
+        const receiver = this._clientService.getClient(receiverId);
+
+        const room = this._roomsService.getRoom(client.room);
+
+        const event = new PrivateMessageEvent(client, receiver, message);
+
+        this.socket.emit("message-received");
+        room.addEvent(event);
+
+        // this.emitToRoom(room.name, 'server-event', event, (c) => c.id == client.id || c.id == receiver.id);
+        this.io.to(client.room).emit('server-event', event);
     }
 
     join(name: string, roomName: string){
@@ -71,6 +120,8 @@ export class SocketService implements ISocketService{
             this.socket.emit("server-message", "bye.");
             return;
         }
+
+        console.log("On disconnect id: " + this.socket.id);
 
         const client = this._clientService.getClient(this.socket.id);
         this._clientService.deleteClient(this.socket.id);

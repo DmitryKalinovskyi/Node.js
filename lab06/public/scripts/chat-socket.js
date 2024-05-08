@@ -7,11 +7,22 @@ import {name, room} from "./client.js";
 const socket = io();
 const $form = document.querySelector('form');
 const $message_input = document.querySelector("#message-input");
+const $someone_typing = document.querySelector("#someone-typing");
+
 
 $form.addEventListener('submit', (e) => {
     e.preventDefault();
-    socket.emit("message", $message_input.value);
+
+    let message = $message_input.value;
+    if(message === "") return;
+
+    socket.emit("message", message);
     $message_input.value = ""
+});
+
+
+$message_input.addEventListener('input', (e) => {
+    socket.emit("on-type");
 });
 
 // receive arguments that passed in url, and use them in join event
@@ -32,7 +43,7 @@ socket.on("server-event", (event) => {
 })
 
 socket.on("server-message", (message) => {
-    addMessage(new ServerMessage(message));
+    addMessage(ServerMessage(message));
 })
 
 socket.on("message-received", (message) => {
@@ -41,5 +52,14 @@ socket.on("message-received", (message) => {
 
 socket.on("server-test-message", (message) => {
     console.log(message);
+})
+
+
+let timeoutId = null;
+socket.on("on-type", (client) => {
+    $someone_typing.innerHTML = `${client.name} is typing..`;
+
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => $someone_typing.innerHTML = "", 2000);
 })
 

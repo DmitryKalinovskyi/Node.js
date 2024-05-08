@@ -1,8 +1,6 @@
 
 export default function MyMessage(message){
-
-    return `
-    <div class="line my-2">
+    return `<div class="line my-2">
         <div class="my-message">
             <div class="d-flex justify-content-end mw-100">
                 <div class="bg-white p-2 rounded-2 mw-100 overflow-hidden">

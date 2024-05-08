@@ -21,24 +21,27 @@
 
 
         <div class="bg-body-secondary rounded-2 p-2 col-8 col-md-9 h-100" >
-            <div class="h-100 d-flex flex-column justify-content-between ">
-                <div id="list-of-messages" class="flex-fill overflow-y-auto">
+            <div class="d-flex h-100 flex-column justify-content-between ">
+                <div id="list-of-messages" class="flex-fill overflow-y-auto py-4">
 
 
                 </div>
-            <div>
-                <form>
-                    <!-- <div class="row align-items-center"> -->
-                        <div class="col-auto">
-                            <input id="message-input" class="form-control" placeholder="Enter message...">
-                        </div>
-                        <!-- <div class="col-auto">
-                            <button id="send-message-button" class="btn btn-primary">Send</button>
-                        </div> -->
-                        <!-- </div> -->
-                    </form>
+
+                <div class="flex-fill position-relative">
+                    <div class="fst-italic position-absolute" style="top: -24px" id="someone-typing"></div>
+
+                    <form>
+                        <!-- <div class="row align-items-center"> -->
+                            <div class="col-auto">
+                                <input id="message-input" class="form-control" placeholder="Enter message...">
+                            </div>
+                            <!-- <div class="col-auto">
+                                <button id="send-message-button" class="btn btn-primary">Send</button>
+                            </div> -->
+                            <!-- </div> -->
+                        </form>
+                    </div>
                 </div>
-            </div>
 
         </div>
     </div>

@@ -7,7 +7,9 @@ import {name, room} from "./client.js";
 
 const $list_of_messages = document.querySelector("#list-of-messages");
 const $list_of_users = document.querySelector("#list-of-users");
-const $infoDiv = document.querySelector("#infoDiv")
+const $infoDiv = document.querySelector("#infoDiv");
+const $message_input = document.querySelector("#message-input");
+
 // export function addMessage(message){
 //     if(message.type === 'server'){
 //         $list_of_messages.innerHTML += ServerMessage(message.content);
@@ -34,6 +36,17 @@ function onMessageEvent(event){
         addMessage(MyMessage(event.message));
     else
         addMessage(Message(event.sender.name, event.message));
+        // addMessageObject(Message(event.sender, event.message, () =>{
+        //     console.log("Clicked!");
+        //
+        //     let tokens = $message_input.value.split(" ");
+        //     if(tokens.length > 0 && tokens[0][0] === "@")
+        //         $message_input.value = tokens[0] + tokens.slice(1);
+        //     else
+        //     $message_input.value = `@${event.sender.id} ` + $message_input.value
+        //     $message_input.focus();
+        // }
+        // ));
 }
 
 function onDisconnectEvent(event){
@@ -46,6 +59,15 @@ function onJoinEvent(event){
     addMessage(ServerMessage(`${event.client.name} joined to the room.`));
 }
 
+function onPrivateMessageEvent(event){
+    if(event.sender.name === name){
+
+    }
+    else if(event.receiver.name === name){
+
+    }
+}
+
 export function addServerEvent(event){
     let eventHandler = eventMap[event.eventType];
     if(eventHandler !== undefined){
@@ -55,7 +77,12 @@ export function addServerEvent(event){
 
 export function addMessage(message){
     $list_of_messages.innerHTML += message;
+    $list_of_messages.scrollTo(0, $list_of_messages.scrollHeight);
 }
+
+// export function addMessageObject(messageObject){
+//     $list_of_messages.appendChild(messageObject);
+// }
 
 export function addUserToList(name) {
     $list_of_users.innerHTML += ListItem(name);

@@ -38,9 +38,13 @@ io.on('connection', socket => {
 
     socket.on('join', (name, room) => socketService.join(name, room))
 
+    socket.on('on-type', () => socketService.onType())
+
     socket.on('message', (message) => socketService.message(message));
 
     socket.on('disconnect', () => socketService.disconnect());
+
+    socket.on('private-message', (message, receiverId) => socketService.privateMessage(message, receiverId));
 });
 
 server.listen(port, () => {
