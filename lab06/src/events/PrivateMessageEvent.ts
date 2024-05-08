@@ -12,5 +12,5 @@ export class PrivateMessageEvent implements ISocketEvent{
         this.message =  message;
     }
 
-    eventType: string = "PrivateMessage";
+    eventType: string = "PrivateMessageEvent";
 }

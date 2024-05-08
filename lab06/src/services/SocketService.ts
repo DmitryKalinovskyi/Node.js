@@ -121,8 +121,6 @@ export class SocketService implements ISocketService{
             return;
         }
 
-        console.log("On disconnect id: " + this.socket.id);
-
         const client = this._clientService.getClient(this.socket.id);
         this._clientService.deleteClient(this.socket.id);
 

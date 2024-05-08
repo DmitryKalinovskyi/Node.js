@@ -10,6 +10,8 @@ const $list_of_users = document.querySelector("#list-of-users");
 const $infoDiv = document.querySelector("#infoDiv");
 const $message_input = document.querySelector("#message-input");
 
+let clients = [];
+
 // export function addMessage(message){
 //     if(message.type === 'server'){
 //         $list_of_messages.innerHTML += ServerMessage(message.content);
@@ -29,6 +31,7 @@ const eventMap = {
     "MessageEvent" : event => onMessageEvent(event),
     "DisconnectEvent" : event => onDisconnectEvent(event),
     "JoinEvent" : event => onJoinEvent(event),
+    "PrivateMessageEvent" : event => onPrivateMessageEvent(event)
 }
 
 function onMessageEvent(event){
@@ -51,21 +54,27 @@ function onMessageEvent(event){
 
 function onDisconnectEvent(event){
     removeUserFromList(event.client.name);
+    clients = clients.filter(c => c.id !== event.client.id);
     addMessage(ServerMessage(`${event.client.name} disconnected from the room.`));
 }
 
 function onJoinEvent(event){
     addUserToList(event.client.name)
+    clients.push(event.client);
     addMessage(ServerMessage(`${event.client.name} joined to the room.`));
 }
 
 function onPrivateMessageEvent(event){
     if(event.sender.name === name){
-
+        console.log("You send private message to someone");
+        addMessage(MyMessage(`${event.message}`, `You(to ${event.receiver.name})`))
     }
     else if(event.receiver.name === name){
-
+        console.log("You receive private message from someone");
+        addMessage(Message(event.sender.name + " (to you)", event.message));
     }
+
+    // otherwise you should not get this message from the server.
 }
 
 export function addServerEvent(event){
@@ -100,4 +109,8 @@ export function addRoomInfo(info){
                 <div class="text-white">
                     Room: ${info.room}
                 </div>`
+}
+
+export function getClients(){
+    return clients
 }
