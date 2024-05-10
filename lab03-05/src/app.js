@@ -19,6 +19,7 @@ function onConnection(){
     });
 }
 
+module.exports = app
 
 
 

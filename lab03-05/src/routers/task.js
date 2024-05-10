@@ -46,8 +46,7 @@ router.post("/tasks", auth, async (req, res) => {
         });
 
         await task.save();
-        res.sendStatus(200);
-
+        res.status(200).send(task);
     }
     catch(err){
         if(err instanceof ValidationError)

@@ -26,8 +26,6 @@ router.get("/users/me", auth, async (req, res) => {
 
 router.post("/users/logout", auth,async (req, res) => {
     try{
-        console.log(req.user.tokens);
-
         req.user.tokens = req.user.tokens.filter(token => token.token !== req.token);
         await req.user.save();
         res.sendStatus(200);
@@ -123,7 +121,7 @@ router.post("/users", async (req, res) => {
     catch(err){
         if(err instanceof ValidationError)
         {
-            res.status(500).send(err.message);
+            res.status(401).send(err.message);
         }
         else{
             console.log(err);
