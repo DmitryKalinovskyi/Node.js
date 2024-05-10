@@ -20,7 +20,6 @@ router.get("/users", auth, async (req, res) => {
 router.get("/users/me", auth, async (req, res) => {
     await req.user.populate('tasks');
 
-
     res.status(200).send(req.user);
 })
 
@@ -68,43 +67,6 @@ router.get('/users/:id', auth, async (req, res) => {
     }
 });
 
-// router.get('/users/email/:email', auth,async (req, res) => {
-//
-//     try {
-//         const email = req.params.email;
-//         const user = await UserModel.findOne({email});
-//
-//         if (user == null) {
-//             res.sendStatus(404);
-//         } else {
-//             res.status(200).send(user);
-//         }
-//     }
-//     catch(err){
-//         res.sendStatus(500);
-//     }
-// });
-
-// router.get('/users/emailstart/:email', async (req, res) => {
-//
-//     try {
-//         let email = req.params.email;
-//         if(email[0] === ':')
-//             email = "";
-//
-//         const escapedEmail = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-//
-//         const regex = new RegExp(`^${escapedEmail}`, 'i');
-//
-//         const users = await UserModel.find({email: regex }).limit(10);
-//
-//         res.status(200).send(users);
-//     }
-//     catch(err){
-//         res.sendStatus(500);
-//     }
-// });
-
 router.post("/users", async (req, res) => {
     try {
         const user = new UserModel({
@@ -115,13 +77,14 @@ router.post("/users", async (req, res) => {
         });
 
         await user.save();
-        res.sendStatus(200);
+        res.status(200).send(user);
 
     }
     catch(err){
         if(err instanceof ValidationError)
         {
-            res.status(401).send(err.message);
+            let message = err.message;
+            res.status(401).send({message});
         }
         else{
             console.log(err);
@@ -202,10 +165,9 @@ router.post("/users/login", async (req, res) => {
         const user = await UserModel.findOneByCredentials(req.body.email, req.body.password);
         const token = await user.generateAuthToken();
 
-        res.send({user, token});
+        res.send({token});
     }
     catch(e){
-        console.log(e.message);
         res.sendStatus(400);
     }
 });

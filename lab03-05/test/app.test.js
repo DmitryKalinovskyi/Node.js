@@ -31,6 +31,7 @@ describe("Test-Scenario", async () => {
             .post("/users")
             .send(user1);
 
+        console.log(result.body);
         result.should.have.status(401);
     })
 
@@ -48,6 +49,7 @@ describe("Test-Scenario", async () => {
             .send(user1);
 
         res.should.have.status(200);
+        console.log(res.body)
     })
 
     it("Add user 2", async () => {
@@ -64,6 +66,7 @@ describe("Test-Scenario", async () => {
             .send(user1);
 
         res.should.have.status(200);
+        console.log(res.body)
     })
 
     let token;
@@ -80,6 +83,7 @@ describe("Test-Scenario", async () => {
 
         res.should.have.status(200);
         token = res.body.token;
+        console.log(res.body)
     });
 
 
@@ -98,12 +102,13 @@ describe("Test-Scenario", async () => {
 
         res.should.have.status(200);
         task1 = res.body;
+        console.log(res.body);
     });
 
     it("Adding Task 2",  async()=> {
         const task2 = {
             title: "Task 2",
-            description: "Do some work 1",
+            description: "Do some work 2",
             completed: false,
         }
 
@@ -113,6 +118,7 @@ describe("Test-Scenario", async () => {
             .send(task2);
 
         res.should.have.status(200);
+        console.log(res.body);
     });
 
     it("Get user tasks", async() => {
@@ -141,8 +147,8 @@ describe("Test-Scenario", async () => {
             .post("/users/logout")
             .set("Authorization", `Bearer ${token}`);
 
-
         res.should.have.status(200);
+        console.log(res.body);
     });
 
     it("Login by user2",  async()=> {
@@ -173,6 +179,7 @@ describe("Test-Scenario", async () => {
             .send(task3);
 
         res.should.have.status(200);
+        console.log(res.body);
     });
 
     it("Get user tasks", async() => {
@@ -207,6 +214,7 @@ describe("Test-Scenario", async () => {
             .get(`/tasks/${task1._id}`)
 
         res.should.have.status(403);
+        res.body.should.have.property("message", "Forbidden Access");
     });
 
 });
